@@ -1,0 +1,142 @@
+package com.company;
+
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
+import org.omg.PortableInterceptor.INACTIVE;
+import org.w3c.dom.ls.LSOutput;
+
+import java.lang.reflect.Array;
+import java.util.*;
+
+import static java.util.Arrays.*;
+
+class Trio{
+    int a;
+    int b;
+    int gcd;
+    public Trio(int a,int b,int gcd){
+        this.a = a;
+        this.b = b;
+        this.gcd = gcd;
+    }
+}
+class TrioSort implements Comparator<Trio>{
+
+    @Override
+    public int compare(Trio o1, Trio o2) {
+        return o2.gcd-o1.gcd;
+    }
+}
+
+public class Main {
+    static int count = 0;
+    static long solve(int n, ArrayList<Integer> list){
+        count++;
+        if(list.size()==0)
+            return 0;
+        if(list.size()==2)
+            return gcd(list.get(0),list.get(1));
+
+        //System.out.println(list);
+        long max = 0;
+        for(int i=0;i<list.size();i++){
+            int a = list.get(i);
+            for(int j=0;j<list.size();j++){
+                if(i==j)
+                    continue;
+                int b =list.get(j);
+                ArrayList<Integer> newList = new ArrayList<>();
+                for(int k=0;k<list.size();k++)
+                {
+                    if(k==i || k==j)
+                        continue;
+                    newList.add(list.get(k));
+                }
+                long gcdVal = gcd(a,b) * n;
+                long recVal = solve(n-1,newList);
+                max = Math.max(max,gcdVal+recVal);
+            }
+        }
+        return  max;
+    }
+
+    private static int gcd(int a, int b) {
+        if(b>a)
+            return gcd(b,a);
+        if(b==0)
+            return a;
+        return gcd(b,a%b);
+    }
+
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        int n =sc.nextInt();
+        ArrayList<Integer> list = new ArrayList<>();
+        for(int i=0;i<2*n;i++)
+        {
+            int a = sc.nextInt();
+            list.add(a);
+
+        }
+        long ans= solve(n,list);
+        System.out.println("recursion ans:"+ans);
+        ArrayList<Trio> glist = new ArrayList<>();
+        for(int i=0;i<list.size();i++){
+            for(int j=i+1;j<list.size();j++){
+                int a = list.get(i);
+                int b = list.get(j);
+                int gcdVal = gcd(a,b);
+                glist.add(new Trio(a,b,gcdVal));
+            }
+        }
+        Collections.sort(glist,new TrioSort());
+
+        for(int i=0;i<glist.size();i++)
+        {
+            Trio t = glist.get(i);
+        //    System.out.println(t.a+" "+t.b+" "+t.gcd);
+        }
+        HashMap<Integer,Integer> map = new HashMap<>();
+        for(int i=0;i<list.size();i++)
+        {
+            map.put(list.get(i),map.getOrDefault(list.get(i),0)+1);
+        }
+        System.out.println(map);
+        int times = glist.size();
+        ans = 0;
+        for(int j=0;j<glist.size();j++){
+            HashMap<Integer,Integer> kmap = new HashMap<>(map);
+            int size = n;
+            int tmpans = 0;
+            for(int i=j;i<glist.size();i++){
+                Trio t = glist.get(i);
+                if(map.containsKey(t.a) && map.containsKey(t.b) ){
+                    //System.out.println(map);
+                    //System.out.println(t.a);
+                    //System.out.println(t.b);
+                    tmpans+=t.gcd*size;
+                    size--;
+                    map.put(t.a,map.get(t.a)-1);
+                    map.put(t.b,map.get(t.b)-1);
+                    if(map.get(t.a)==0)
+                        map.remove(t.a);
+                    if(map.containsKey(t.b) && map.get(t.b)==0)
+                        map.remove(t.b);
+                }
+                if(size==0)
+                    break;
+
+            }
+            if(size==0)
+            ans = Math.max(ans,tmpans);
+        }
+        System.out.println(ans);
+
+
+
+
+        }
+
+
+    }
+
+
