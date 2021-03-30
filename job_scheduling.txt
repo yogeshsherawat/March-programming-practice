@@ -1,0 +1,79 @@
+package com.company;
+import java.util.*;
+
+class Job{
+    int s;
+    int e;
+    int p;
+    public Job(int s,int e,int p){
+        this.s = s;
+        this.e = e;
+        this.p = p;
+    }
+}
+class JobSort implements Comparator<Job>{
+    @Override
+    public int compare(Job o1, Job o2) {
+        return o1.e-o2.e;
+    }
+}
+
+public class Main {
+
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        int n  = sc.nextInt();
+        Job[] arr = new Job[n];
+        for(int i=0;i<n;i++){
+            int a = sc.nextInt();
+            int b =sc.nextInt();
+            int c  =sc.nextInt();
+            arr[i]=new Job(a,b,c);
+        }
+
+        Collections.sort(Arrays.asList(arr),new JobSort());
+        HashMap<Integer,Integer> map = new HashMap<>();
+        map.put(0,0);
+        map.put(arr[0].e,arr[0].p);
+        int max = arr[0].p;
+        for(int i=1;i<n;i++){
+            Job j = arr[i];
+            System.out.println(j.s + " "+ j.e + " "+ j.p);
+            int start = j.s;
+            int end = j.e;
+            int profit = j.p;
+            if(map.containsKey(start)){
+                int sum = map.get(start)+profit;
+                int alreadyInMap = (map.containsKey(end)?map.get(end):0);
+                sum= Math.max(alreadyInMap,sum);
+                map.put(end,sum);
+
+                System.out.println(sum);
+                max = Math.max(sum,max);
+            }
+            else{
+                int nearestToStart = 0;
+                for(int ele:map.keySet()){
+                    if(ele<start && ele>nearestToStart)
+                        nearestToStart = ele;
+                }
+                int sum = map.get(nearestToStart)+profit;
+                int alreadyInMap = (map.containsKey(end)?map.get(end):0);
+                sum= Math.max(alreadyInMap,sum);
+                map.put(end,sum);
+                System.out.println(sum);
+                max = Math.max(max,sum);
+            }
+
+        }
+        System.out.println(max);
+        sc.close();
+
+
+
+        }
+
+
+    }
+
+

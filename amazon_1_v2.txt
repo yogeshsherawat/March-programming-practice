@@ -1,0 +1,121 @@
+package com.company;
+
+import java.util.*;
+
+
+class Trio{
+    int a;
+    int b;
+    int gcd;
+    public Trio(int a,int b,int gcd){
+        this.a = a;
+        this.b = b;
+        this.gcd = gcd;
+    }
+}
+class TrioSort implements Comparator<Trio>{
+
+    @Override
+    public int compare(Trio o1, Trio o2) {
+        return o2.gcd-o1.gcd;
+    }
+}
+
+public class Main {
+    
+
+    private static int gcd(int a, int b) {
+        if(b>a)
+            return gcd(b,a);
+        if(b==0)
+            return a;
+        return gcd(b,a%b);
+    }
+
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        int n =sc.nextInt();
+        ArrayList<Integer> list = new ArrayList<>();
+        for(int i=0;i<2*n;i++)
+        {
+            int a = sc.nextInt();
+            list.add(a);
+
+        }
+        long ans= 0;
+        ArrayList<Trio> glist = new ArrayList<>();
+        for(int i=0;i<list.size();i++){
+            for(int j=i+1;j<list.size();j++){
+                int a = list.get(i);
+                int b = list.get(j);
+                int gcdVal = gcd(a,b);
+                glist.add(new Trio(a,b,gcdVal));
+            }
+        }
+        Collections.sort(glist,new TrioSort());
+
+        
+        HashMap<Integer,Integer> map = new HashMap<>();
+        for(int i=0;i<list.size();i++)
+        {
+            map.put(list.get(i),map.getOrDefault(list.get(i),0)+1);
+        }
+        map.put(-1,n);
+        //System.out.println(map);
+        ans = 0;
+
+        ArrayList<HashMap<Integer,Integer>> mapList = new ArrayList<>();
+        mapList.add(map);
+        for(Trio i:glist)
+            mapList.add(null);
+        long dp[]=new long[glist.size()+1];
+        dp[0]=0;
+
+        for(int i=1;i<=glist.size();i++){
+            Trio t = glist.get(i-1);
+
+            long tmpAns = 0;
+            for(int j=i-1;j>=0;j--){
+                HashMap<Integer,Integer> tmp = mapList.get(j);
+                HashMap<Integer,Integer> currMap = new HashMap<>();
+                currMap.putAll(tmp);
+                if(currMap.get(t.a)>0 && currMap.get(t.b)>0){
+                    if(t.a == t.b && currMap.get(t.a)<2)
+                        continue;
+
+                    int tmpN = currMap.get(-1);
+                    currMap.put(-1,tmpN-1);
+                    long xans = dp[j]+t.gcd*tmpN;
+                    if(t.a==t.b){
+                        currMap.put(t.a,currMap.get(t.a)-2);
+                    }
+                    else{
+                        currMap.put(t.a,currMap.get(t.a)-1);
+                        currMap.put(t.b,currMap.get(t.b)-1);
+                    }
+                    if(xans>tmpAns)
+                    {
+                        tmpAns=xans;
+                    mapList.set(i,currMap);
+                    }
+
+
+
+                }
+            }
+            dp[i]=tmpAns;
+        }
+
+        for(long i:dp)
+        ans = Math.max(ans,i);
+        System.out.println(ans);
+        System.out.println(solve(n,list));
+
+
+
+    }
+
+
+}
+
+

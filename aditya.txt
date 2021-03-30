@@ -1,0 +1,106 @@
+package com.company;
+
+import java.util.*;
+
+
+public class Main {
+    static int count = 0;
+    static int count2=0;
+    static int rec(ArrayList<Integer> list){
+        count++;
+        if(list.size()==3)
+            return list.get(0)*list.get(1)*list.get(2);
+        int min = Integer.MAX_VALUE;
+        for(int i=1;i<list.size()-1;i++){
+            int k = list.get(i-1)*list.get(i)*list.get(i+1);
+            int store = list.get(i);
+            list.remove(i);
+            int k2 = rec(list);
+            list.add(i,store);
+            int k3 = k+k2;
+            min = Math.min(min,k3);
+        }
+        return  min;
+
+    }
+
+    static int MatrixChainOrder(int p[],int i,int j){
+        count2++;
+        if (i == j)
+            return 0;
+
+        int min = Integer.MAX_VALUE;
+
+        // place parenthesis at different places between
+        // first and last matrix, recursively calculate
+        // count of multiplications for each parenthesis
+        // placement and return the minimum count
+        for (int k = i; k < j; k++)
+        {
+            int count = MatrixChainOrder(p, i, k)
+                    + MatrixChainOrder(p, k + 1, j)
+                    + p[i - 1] * p[k] * p[j];
+
+            if (count < min)
+                min = count;
+        }
+
+        // Return minimum count
+        return min;
+
+    }
+
+    static String sol(String s,int x, int k){
+        int n = s.length()/x;
+        if(s.length()%x!=0)
+            n++;
+        int arr[]=new int[n];
+        int tmpn = n;
+        for(int i=1;i<=n;i++){
+            if(i==n)
+                arr[i-1]=tmpn;
+            arr[i-1]=x;
+            tmpn-=x;
+        }
+        int total=1;
+        for(int i:arr)
+            total*=i;
+        if(k>total)
+            return "-1";
+        System.out.println("---------");
+        ArrayList<Integer> list = new ArrayList<>();
+        for(int i=0;i<n;i++){
+
+            int t1 = total/arr[i];
+            int t2 = k/t1;
+            int t3 = k%t1;
+            if(t3!=0)
+                t2++;
+            list.add(t2);
+            total = t1;
+        }
+        System.out.println(list);
+        return "";
+    }
+
+    public static void main(String args[]) {
+        int arr[]={10, 20, 30, 40, 30 };
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        for(int i:arr)
+            list.add(i);
+        int k2 = rec(list);
+        System.out.println(k2);
+        int k= MatrixChainOrder(arr,1,arr.length-1);
+        System.out.println(k);
+        System.out.println(count+" "+count2);
+        String ans = sol("1234567891",5,10);
+        System.out.println(ans);
+
+    }
+
+
+
+
+}
+
+
